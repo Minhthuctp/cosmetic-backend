@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from 'src/Schema/Product.schema';
 import { Model } from 'mongoose';
@@ -11,7 +11,7 @@ import {
   maxOfPrice,
 } from '../constant/common';
 import { buildProductOptions, buildProductSort } from './utils/helper';
-import { ProductDto } from './dto/product.dto';
+import { ProductDto, ProductUpdateDto } from './dto/product.dto';
 
 @Injectable()
 export class ProductService {
@@ -60,7 +60,6 @@ export class ProductService {
       if (req.query.orderBy) {
         orderBy = req.query.orderBy.toString();
       }
-      console.log(options);
 
       const products = await this.get(
         buildProductOptions(options),
@@ -118,9 +117,23 @@ export class ProductService {
     }
   }
 
+  @UsePipes(new ValidationPipe({ transform: true }))
   async createProduct(productDto: ProductDto) {
     try {
       return await this.productModel.create(productDto);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateProduct(id: string, updateData: ProductUpdateDto) {
+    try {
+      return (
+        await this.productModel.findByIdAndUpdate({ _id: id }, updateData, {
+          new: true,
+        })
+      ).populate(['images', 'categories']);
     } catch (error) {
       console.log(error);
     }

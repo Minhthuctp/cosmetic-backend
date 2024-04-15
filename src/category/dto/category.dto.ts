@@ -5,3 +5,8 @@ export class CategoryDto {
   @IsNotEmpty()
   id: string;
 }
+
+export class CategoryDetails {
+  @IsNotEmpty()
+  name: string;
+}

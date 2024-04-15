@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category, CategoryDocument } from 'src/Schema/category.schema';
 import { Model } from 'mongoose';
+import { CategoryDetails } from './dto/category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -25,6 +26,24 @@ export class CategoryService {
         categories: { $in: ids },
       });
       return categories;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async createCategory(category: CategoryDetails) {
+    try {
+      return await this.categoryModel.create(category);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateCategory(id: string, category: CategoryDetails) {
+    try {
+      return await this.categoryModel.findByIdAndUpdate({ _id: id }, category, {
+        new: true,
+      });
     } catch (error) {
       console.log(error);
     }
