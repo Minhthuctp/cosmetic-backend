@@ -17,6 +17,7 @@ import { Request } from 'express';
 import { CategoryService } from 'src/category/category.service';
 import { ImageService } from 'src/image/image.service';
 import { ProductService } from 'src/product/product.service';
+import { Zero } from 'src/constant/common';
 
 @Controller('admin')
 export class AdminController {
@@ -41,12 +42,10 @@ export class AdminController {
       additionalInfos: req.body.additionalInfos,
       quantity: req.body.quantity,
     };
-    console.log(newProduct);
-    console.log(files);
     const fileList = await this.imageService.uploadImages(files);
     // ** Save images url to our mongoDB collections
     let imgs = [];
-    for (let i = 0; i < fileList.length; i++) {
+    for (let i = Zero; i < fileList.length; i++) {
       const img = fileList[i];
       const image = await this.imageService.createImage(img);
       imgs.push(image.id);
@@ -54,7 +53,7 @@ export class AdminController {
     // console.log(imgs);
     // ** Get array of image's id and add to our product
     newProduct.images = imgs;
-    const product = this.productService.createProduct(newProduct);
+    const product = await this.productService.createProduct(newProduct);
     if (!product) {
       throw new HttpException(
         'Failed to create new product',

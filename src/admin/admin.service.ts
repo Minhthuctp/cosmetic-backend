@@ -4,6 +4,4 @@ import { ImageService } from 'src/image/image.service';
 import { ProductService } from 'src/product/product.service';
 
 @Injectable()
-export class AdminService {
-  //   async createProduct() {}
-}
+export class AdminService {}
