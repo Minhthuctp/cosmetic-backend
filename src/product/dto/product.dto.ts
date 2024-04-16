@@ -43,4 +43,18 @@ export class ProductDto {
   @IsArray()
   @Type(() => CategoryDto)
   categories: CategoryDto[];
+
+  @IsNumber()
+  @IsNotEmpty()
+  quantity: number;
+}
+
+export class ProductUpdateDto {
+  @IsNumber()
+  @IsOptional()
+  price: number;
+
+  @IsNumber()
+  @IsOptional()
+  quantity: number;
 }
