@@ -1,6 +1,6 @@
 import { v2 } from 'cloudinary';
 import { CLOUDINARY } from './constants';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 const config: ConfigService = new ConfigService();
 

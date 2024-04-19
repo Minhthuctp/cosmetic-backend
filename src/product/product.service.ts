@@ -1,7 +1,12 @@
-import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument } from 'src/Schema/Product.schema';
-import { Model } from 'mongoose';
+import { Product, ProductDocument } from 'src/schemas/Product.schema';
+import { ClientSession, Model } from 'mongoose';
 import { productQuery } from './dto/productQuery.dto';
 import { Request } from 'express';
 import {
@@ -137,5 +142,20 @@ export class ProductService {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async getProductById(
+    productId: string,
+    session?: ClientSession,
+  ): Promise<Product> {
+    let productQuery = this.productModel.findById(productId);
+    if (session) {
+      productQuery = productQuery.session(session);
+    }
+    const product = await productQuery.exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found.`);
+    }
+    return product;
   }
 }
