@@ -5,9 +5,9 @@ import { ProductService } from 'src/product/product.service';
 import { CategoryService } from 'src/category/category.service';
 import { ImageService } from 'src/image/image.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from 'src/Schema/Product.schema';
-import { Category, CategorySchema } from 'src/Schema/category.schema';
-import { Image, ImageSchema } from 'src/Schema/image.schema';
+import { Product, ProductSchema } from 'src/schemas/Product.schema';
+import { Category, CategorySchema } from 'src/schemas/category.schema';
+import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Module({

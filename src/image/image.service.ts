@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Image, ImageDocument } from 'src/Schema/image.schema';
+import { Image, ImageDocument } from 'src/schemas/image.schema';
 import { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageDetailsDto, ImageDto } from './dto/image.dto';
