@@ -22,8 +22,12 @@ import { Zero, invalidPrice, invalidQuantity } from 'src/constant/common';
 import { RolesGuard } from 'src/guards/roles.guards';
 import { Roles } from 'src/guards/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CategoryDetails } from 'src/category/dto/category.dto';
+import { ProductDto } from 'src/product/dto/product.dto';
 
 @Controller('admin')
+@ApiTags('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {
   constructor(
@@ -34,6 +38,8 @@ export class AdminController {
 
   @Post('createProduct')
   @Roles('admin')
+  @ApiOperation({ summary: 'Create product' })
+  @ApiBody({ type: ProductDto })
   @UseInterceptors(FilesInterceptor('images'))
   async createProduct(
     @Req() req: Request,
@@ -72,6 +78,8 @@ export class AdminController {
 
   @Post('createCategory')
   @Roles('admin')
+  @ApiOperation({ summary: 'Create category' })
+  @ApiBody({ type: CategoryDetails })
   async createCatetory(@Req() req: Request) {
     const newCategory: any = {
       name: req.body.name,
