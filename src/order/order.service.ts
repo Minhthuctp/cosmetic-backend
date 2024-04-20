@@ -52,10 +52,17 @@ export class OrderService {
       const orderData = {
         orderItems: cart.items,
         user: userId,
-        // Other fields such as delivery info, shipping time, shipping fee, etc.
       };
       const createdOrder = new this.orderModel(orderData);
       await createdOrder.save({ session });
+
+      for (const item of cart.items) {
+        await this.productService.decrementProductQuantity(
+          item.productId,
+          item.quantity,
+          session,
+        );
+      }
 
       await session.commitTransaction();
       session.endSession();
@@ -67,6 +74,4 @@ export class OrderService {
       throw error;
     }
   }
-
-  // Other methods...
 }

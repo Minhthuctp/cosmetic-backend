@@ -9,6 +9,7 @@ import { Product, ProductSchema } from 'src/schemas/Product.schema';
 import { Category, CategorySchema } from 'src/schemas/category.schema';
 import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
   ],
   controllers: [AdminController],
   providers: [
+    JwtService,
     ProductService,
     CloudinaryService,
     CategoryService,

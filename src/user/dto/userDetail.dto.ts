@@ -5,7 +5,7 @@ export class UserDetail {
   email: string;
 
   @IsNotEmpty()
-  hashPassword: string;
+  password: string;
 
   @IsNotEmpty()
   firstName: string;

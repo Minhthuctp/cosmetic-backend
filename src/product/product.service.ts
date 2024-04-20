@@ -125,7 +125,10 @@ export class ProductService {
   @UsePipes(new ValidationPipe({ transform: true }))
   async createProduct(productDto: ProductDto) {
     try {
-      return await this.productModel.create(productDto);
+      return (await this.productModel.create(productDto)).populate([
+        'images',
+        'categories',
+      ]);
     } catch (error) {
       console.log(error);
     }
@@ -157,5 +160,26 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${productId} not found.`);
     }
     return product;
+  }
+
+  async decrementProductQuantity(
+    productId: string,
+    quantityToDecrement: number,
+    session?: ClientSession,
+  ): Promise<void> {
+    const product = await this.productModel.findById(productId).exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found.`);
+    }
+
+    // Ensure there's enough quantity to decrement
+    if (product.quantity < quantityToDecrement) {
+      throw new Error(
+        `Insufficient quantity for product with ID ${productId}.`,
+      );
+    }
+
+    product.quantity -= quantityToDecrement;
+    await product.save({ session });
   }
 }

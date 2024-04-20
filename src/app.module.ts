@@ -9,11 +9,13 @@ import { NotificationModule } from './notification/notification.module';
 import { UserModule } from './user/user.module';
 import { OrderModule } from './order/order.module';
 import { CartService } from './cart/cart.service';
+import { AuthModule } from './auth/auth.module';
 
 const config: ConfigService = new ConfigService();
 
 @Module({
   imports: [
+    AuthModule,
     ProductModule,
     ConfigModule.forRoot({
       isGlobal: true,

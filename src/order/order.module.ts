@@ -10,6 +10,9 @@ import { Category, CategorySchema } from 'src/schemas/category.schema';
 import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CartService } from 'src/cart/cart.service';
 import { ProductService } from 'src/product/product.service';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -31,7 +34,13 @@ import { ProductService } from 'src/product/product.service';
       { name: Image.name, schema: ImageSchema },
     ]),
   ],
-  providers: [OrderService, CartService, ProductService],
+  providers: [
+    JwtService,
+    ConfigService,
+    OrderService,
+    CartService,
+    ProductService,
+  ],
   controllers: [OrderController],
 })
 export class OrderModule {}
