@@ -10,6 +10,7 @@ import {
   Query,
   Req,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -18,8 +19,12 @@ import { CategoryService } from 'src/category/category.service';
 import { ImageService } from 'src/image/image.service';
 import { ProductService } from 'src/product/product.service';
 import { Zero, invalidPrice, invalidQuantity } from 'src/constant/common';
+import { RolesGuard } from 'src/guards/roles.guards';
+import { Roles } from 'src/guards/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {
   constructor(
     private productService: ProductService,
@@ -28,6 +33,7 @@ export class AdminController {
   ) {}
 
   @Post('createProduct')
+  @Roles('admin')
   @UseInterceptors(FilesInterceptor('images'))
   async createProduct(
     @Req() req: Request,
@@ -65,12 +71,11 @@ export class AdminController {
   }
 
   @Post('createCategory')
+  @Roles('admin')
   async createCatetory(@Req() req: Request) {
     const newCategory: any = {
       name: req.body.name,
     };
-
-    console.log(newCategory);
 
     const category = await this.categoryService.createCategory(newCategory);
     if (!category) {
@@ -83,6 +88,7 @@ export class AdminController {
   }
 
   @Patch('updateProduct/:id')
+  @Roles('admin')
   async updateProduct(@Req() req: Request, @Param('id') id: string) {
     let product: any = {};
     if (req.body.price) {
@@ -109,6 +115,7 @@ export class AdminController {
   }
 
   @Patch('updateCategory/:id')
+  @Roles('admin')
   async updateCategory(@Req() req: Request, @Param('id') id: string) {
     let category: any = {};
     if (req.body.name) {
