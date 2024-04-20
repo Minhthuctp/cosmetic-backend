@@ -98,6 +98,7 @@ export class ProductService {
 
   async get(options: any, page?: number, limit?: number, sort?: any) {
     try {
+      console.log(options);
       const products = await this.productModel
         .find(options)
         .skip((page - 1) * limit)

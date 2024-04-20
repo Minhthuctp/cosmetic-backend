@@ -1,9 +1,19 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UnauthorizedException,
+  UsePipes,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDetail } from 'src/user/dto/userDetail.dto';
 import { UserService } from 'src/user/user.service';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { LogInRequest } from './dto/logInRequest.dto';
+import { pipeline } from 'stream';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -11,6 +21,8 @@ export class AuthController {
   ) {}
 
   @Post('signUp')
+  @ApiOperation({ summary: 'Sign up' })
+  @ApiBody({ type: UserDetail })
   async signUp(
     @Body()
     body: {
@@ -32,6 +44,8 @@ export class AuthController {
   }
 
   @Post('logIn')
+  @ApiBody({ type: LogInRequest })
+  @ApiOperation({ summary: 'Log in' })
   async logIn(@Body() body: { email: string; password: string }) {
     const { email, password } = body;
     const user = await this.authService.validateUser(email, password);

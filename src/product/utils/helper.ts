@@ -46,7 +46,7 @@ export function buildProductSort(orderBy: string) {
     case 'priceDesc':
       sort.price = -1;
       break;
-    case 'date':
+    case 'createAt':
       sort.createdAt = 1;
       break;
   }
