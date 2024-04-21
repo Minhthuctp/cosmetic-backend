@@ -4,19 +4,6 @@ import mongoose, { Document } from 'mongoose';
 export type CartDocument = Cart & Document;
 
 @Schema()
-export class CartItem {
-  @Prop({
-    required: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-  })
-  productId: string;
-
-  @Prop({ required: true })
-  quantity: number;
-}
-
-@Schema()
 export class Cart {
   @Prop({
     required: true,
@@ -25,8 +12,15 @@ export class Cart {
   })
   user: string;
 
-  @Prop({ type: [CartItem], default: [] })
-  items: CartItem[];
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+  })
+  product: string;
+
+  @Prop({ required: true })
+  quantity: number;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

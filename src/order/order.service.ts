@@ -2,75 +2,97 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ClientSession } from 'mongoose';
-import { OrderDocument, Order } from 'src/schemas/order.schema';
+import { ClientSession, Model } from 'mongoose';
+import {
+  OrderDocument,
+  Order,
+  OrderItem,
+  DeliveryInfo,
+} from 'src/schemas/order.schema';
 import { CartService } from 'src/cart/cart.service';
 import { ProductService } from 'src/product/product.service';
-import { Cart } from 'src/schemas/cart.schema';
+import { CreateOrderDto } from './dto/createOrder.dto';
+import { stat } from 'fs';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private cartService: CartService,
     private productService: ProductService,
+    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
   ) {}
 
-  async createOrderFromCart(cartId: string, userId: string): Promise<Order> {
-    const session = await this.orderModel.db.startSession();
-    session.startTransaction();
-
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async createOrder(createOrderDto: CreateOrderDto) {
+    // const session = await this.orderModel.db.startSession();
+    // session.startTransaction();
     try {
-      // Retrieve cart data
-      //   const cart = await this.cartService.getCartById(cartId, session);
-      let cart: Cart;
-      if (!cart) {
-        throw new NotFoundException(`Cart with ID ${cartId} not found.`);
-      }
-
-      // Validate cart items
-      for (const item of cart.items) {
+      let totalPrice = 0;
+      let orderItems: OrderItem[] = [];
+      // console.log(createOrderDto.carts);
+      for (let cartId of createOrderDto.carts) {
+        console.log(cartId);
+        const cart = await this.cartService.getCartByIdNUserId(
+          cartId,
+          createOrderDto.user,
+          // session,
+        );
+        if (!cart) {
+          throw new NotFoundException(`Cart with ID ${cartId} not found.`);
+        }
         const product = await this.productService.getProductById(
-          item.productId,
-          session,
+          cart.product,
+          // session,
         );
         if (!product) {
           throw new NotFoundException(
-            `Product with ID ${item.productId} not found.`,
+            `Product with ID ${cart.product} not found.`,
           );
         }
-        if (item.quantity > product.quantity) {
+        if (cart.quantity > product.quantity) {
           throw new BadRequestException(
             `Insufficient stock for product ${product.productName}.`,
           );
         }
-      }
-
-      // Create order
-      const orderData = {
-        orderItems: cart.items,
-        user: userId,
-      };
-      const createdOrder = new this.orderModel(orderData);
-      await createdOrder.save({ session });
-
-      for (const item of cart.items) {
         await this.productService.decrementProductQuantity(
-          item.productId,
-          item.quantity,
-          session,
+          cart.product,
+          cart.quantity,
+          // session,
         );
+        await this.cartService.deleteCartByIdNUserId(
+          cartId,
+          createOrderDto.user,
+        );
+        totalPrice += product.price * cart.quantity;
+        orderItems.push({
+          productId: cart.product,
+          quantity: cart.quantity,
+        });
+      }
+      const orderData = {
+        user: createOrderDto.user,
+        orderItems: orderItems,
+        payment: createOrderDto.payment,
+        totalPrice: totalPrice,
+        deliveryInfo: createOrderDto.deliveryInfo,
+        status: 'pending',
+      };
+      if (orderData.payment.paymentMethod === 'COD') {
+        orderData.status = 'confirmed';
       }
 
-      await session.commitTransaction();
-      session.endSession();
-
+      const createdOrder = await this.orderModel.create(orderData);
+      // , {
+      //   // session: session,
+      // });
       return createdOrder;
     } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
+      // await session.abortTransaction();
+      // session.endSession();
       throw error;
     }
   }

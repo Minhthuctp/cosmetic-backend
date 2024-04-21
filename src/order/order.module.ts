@@ -10,12 +10,13 @@ import { Category, CategorySchema } from 'src/schemas/category.schema';
 import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CartService } from 'src/cart/cart.service';
 import { ProductService } from 'src/product/product.service';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { CartModule } from 'src/cart/cart.module';
 
 @Module({
   imports: [
+    CartModule,
     MongooseModule.forFeature([
       {
         name: User.name,
@@ -35,10 +36,10 @@ import { JwtService } from '@nestjs/jwt';
     ]),
   ],
   providers: [
+    CartService,
     JwtService,
     ConfigService,
     OrderService,
-    CartService,
     ProductService,
   ],
   controllers: [OrderController],
