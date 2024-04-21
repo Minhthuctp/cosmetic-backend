@@ -16,23 +16,22 @@ export class AuthService {
     const user = await this.userService.findOne(email);
     if (user && (await bcrypt.compare(password, user.hashPassword))) {
       const { hashPassword, ...result } = user;
-      console.log(result);
       return result;
     }
     return null;
   }
 
   async generateRefreshToken(user: any) {
-    const payload = { email: user['_doc'].email, role: user['_doc'].role };
+    const payload = { id: user['_doc'].id, role: user['_doc'].role };
     return this.jwtService.sign(payload, { expiresIn: '7d' });
   }
 
   async generateToken(user: any) {
     const payload = {
-      email: user['_doc'].email,
+      id: user['_doc']._id,
       role: user['_doc'].role,
     };
-    console.log(payload);
+    // console.log(payload);
     return {
       access_token: this.jwtService.sign(payload, {
         expiresIn: '15m',

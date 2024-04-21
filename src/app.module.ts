@@ -8,8 +8,8 @@ import { AdminModule } from './admin/admin.module';
 import { NotificationModule } from './notification/notification.module';
 import { UserModule } from './user/user.module';
 import { OrderModule } from './order/order.module';
-import { CartService } from './cart/cart.service';
 import { AuthModule } from './auth/auth.module';
+import { CartModule } from './cart/cart.module';
 
 const config: ConfigService = new ConfigService();
 
@@ -17,6 +17,7 @@ const config: ConfigService = new ConfigService();
   imports: [
     AuthModule,
     ProductModule,
+    CartModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -30,6 +31,5 @@ const config: ConfigService = new ConfigService();
     UserModule,
     OrderModule,
   ],
-  providers: [CartService],
 })
 export class AppModule {}

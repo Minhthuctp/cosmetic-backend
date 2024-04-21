@@ -10,7 +10,6 @@ import { UserDetail } from 'src/user/dto/userDetail.dto';
 import { UserService } from 'src/user/user.service';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { LogInRequest } from './dto/logInRequest.dto';
-import { pipeline } from 'stream';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -53,7 +52,11 @@ export class AuthController {
       throw new UnauthorizedException();
     }
 
-    return this.authService.generateToken(user);
+    const token = await this.authService.generateToken(user);
+    return {
+      ...token,
+      id: user['_doc']._id,
+    };
   }
 
   @Post('refreshToken')
