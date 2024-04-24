@@ -39,7 +39,12 @@ export class AuthController {
     };
     const user = await this.userService.createUser(userDetail);
 
-    return this.authService.generateToken(user);
+    return {
+      ...(await this.authService.generateToken(user)),
+      firstName: user['_doc'].firstName,
+      lastName: user['_doc'].lastName,
+      email: user['_doc'].email,
+    };
   }
 
   @Post('logIn')
@@ -51,11 +56,11 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException();
     }
-
-    const token = await this.authService.generateToken(user);
     return {
-      ...token,
-      id: user['_doc']._id,
+      ...(await this.authService.generateToken(user)),
+      firstName: user['_doc'].firstName,
+      lastName: user['_doc'].lastName,
+      email: user['_doc'].email,
     };
   }
 

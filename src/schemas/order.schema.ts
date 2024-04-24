@@ -17,6 +17,10 @@ export class OrderItem {
   @ApiProperty()
   @Prop({ required: true })
   quantity: number;
+
+  @ApiProperty()
+  @Prop()
+  isReviewed: boolean;
 }
 
 export class DeliveryInfo {
@@ -30,43 +34,25 @@ export class DeliveryInfo {
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingDistrictCode: string;
+  shippingDistrict: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingDistrictName: string;
+  shippingWard: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingWardName: string;
+  shippingProvince: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingWardCode: string;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  @IsNotEmpty()
-  @IsString()
-  shippingProvinceCode: string;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  @IsNotEmpty()
-  @IsString()
-  shippingProvinceName: string;
-
-  @ApiProperty()
-  @Prop({ required: true })
-  @IsNotEmpty()
-  @IsString()
-  shippingFullAddress: string;
+  shippingAddressDetails: string;
 }
 
 export class Payment {
@@ -103,13 +89,9 @@ export class Order {
   @Prop({ required: true, type: DeliveryInfo, default: {} })
   DeliveryInfo: DeliveryInfo;
 
-  // @ApiProperty()
-  // @Prop({ required: true })
-  // shippingTime: string;
-
-  // @ApiProperty()
-  // @Prop({ required: true })
-  // shippingFee: number;
+  @ApiProperty()
+  @Prop({ required: true })
+  shippingFee: number;
 
   @ApiProperty()
   @Prop({ required: true })

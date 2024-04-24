@@ -6,17 +6,16 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model } from 'mongoose';
-import { Cart, CartDocument } from 'src/schemas/cart.schema';
+import { CartItem, CartItemDocument } from 'src/schemas/cart.schema';
 import { CreateCartDto } from './dto/createCart.dto';
 import { ProductService } from 'src/product/product.service';
-import { create } from 'domain';
 import { UpdateCartDto } from './dto/updateCart.dto';
 
 @Injectable()
 export class CartService {
   constructor(
-    @InjectModel(Cart.name)
-    private cartModel: Model<CartDocument>,
+    @InjectModel(CartItem.name)
+    private cartModel: Model<CartItemDocument>,
     private productService: ProductService,
   ) {}
 
@@ -96,6 +95,33 @@ export class CartService {
         _id: id,
         user: userId,
       });
+      return cart;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // This method will return cart by product ID and user ID
+  async getCartByProductIdNUserId(productId: string, userId: string) {
+    try {
+      const cart = await this.cartModel.findOne({
+        product: productId,
+        user: userId,
+      });
+      return cart;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // This method will update quantity of the cart
+  async updateQuantity(id: string, quantity: number, userId: string) {
+    try {
+      const cart = await this.cartModel.findOneAndUpdate(
+        { _id: id, user: userId },
+        { quantity: quantity },
+        { new: true },
+      );
       return cart;
     } catch (error) {
       console.log(error);

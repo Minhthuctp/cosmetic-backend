@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
+  Get,
   Param,
   Patch,
   Post,
@@ -15,33 +15,75 @@ import { RolesGuard } from 'src/guards/roles.guards';
 import { Roles } from 'src/guards/roles.decorator';
 import { Request } from 'express';
 import { UpdateCartDto } from './dto/updateCart.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CartItem } from 'src/schemas/cart.schema';
+import { ProductService } from 'src/product/product.service';
 
 @Controller('cart')
 @ApiTags('cart')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CartController {
+  orderService: any;
   constructor(private cartService: CartService) {}
 
   @Post('/createCart')
-  @Roles('user')
+  @ApiBody({ type: CreateCartDto, description: 'The data for the new cart' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, description: 'The created cart', type: CartItem })
   async createCart(
     @Body() createCartDto: CreateCartDto,
     @Req() req: Request & { user: { id: string } },
   ) {
-    if (createCartDto.userId !== req.user.id) {
-      throw new ForbiddenException('You can only create your own cart');
+    createCartDto.userId = req.user.id;
+    // Check if the product exists
+    const cart = await this.cartService.getCartByProductIdNUserId(
+      createCartDto.productId,
+      req.user.id,
+    );
+    if (cart) {
+      const updatedCart = await this.cartService.updateCart(
+        cart._id,
+        { quantity: cart.quantity + createCartDto.quantity },
+        req.user.id,
+      );
+      return updatedCart;
     }
     return this.cartService.createCart(createCartDto);
   }
 
   @Patch('/updateCart/:id')
-  @Roles('user')
+  @ApiParam({ name: 'id', description: 'The ID of the cart' })
+  @ApiBody({ type: UpdateCartDto, description: 'The new data for the cart' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'The updated cart' })
   async updateCart(
     @Body() updateCartDto: UpdateCartDto,
     @Req() req: Request & { user: { id: string } },
     @Param('id') id: string,
   ) {
     return this.cartService.updateCart(id, updateCartDto, req.user.id);
+  }
+
+  @Get()
+  @ApiQuery({
+    name: 'userId',
+    required: false,
+    description: 'The ID of the user',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'The carts of the user',
+    type: [CartItem],
+  })
+  async getAllCarts(@Req() req: Request & { user: { id: string } }) {
+    return this.cartService.getCartsByUser(req.user.id);
   }
 }

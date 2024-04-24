@@ -14,11 +14,8 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsArray()
   @IsNotEmpty()
-  carts: String[];
+  cartItems: String[];
 
-  @ApiProperty({ required: true })
-  @IsString()
-  @IsNotEmpty()
   user: string;
 
   @ApiProperty({ required: true })
@@ -31,4 +28,9 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => DeliveryInfo)
   deliveryInfo: DeliveryInfo;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsNumber()
+  shippingFee: number;
 }

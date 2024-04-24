@@ -6,6 +6,8 @@ import { mailContent } from './dto/mailContent.dto';
 import * as fs from 'fs';
 import * as util from 'util';
 import Handlebars from 'handlebars';
+import { Order, OrderDocument } from 'src/schemas/order.schema';
+import { User } from 'src/schemas/user.schema';
 
 @Injectable()
 export class NotificationService {
@@ -44,24 +46,40 @@ export class NotificationService {
     }
   }
 
-  async sendOrderConfirmationEmail(orderInfo) {
+  async sendOrderConfirmationEmail(order: Order, products, user: User) {
     const readFile = util.promisify(fs.readFile);
     const templateContent = await readFile(
       'src/notification/orderConfirmation.html',
       'utf8',
     );
+    let orderItems = [];
+    for (let product of products) {
+      if (order.orderItems) {
+        const orderItem = order.orderItems.find((item) => {
+          return item.productId.toString() == product._id.toString();
+        });
+        orderItems.push({
+          ...orderItem,
+          productName: product.productName,
+          price: product.price,
+          productImage: product.images[0].url,
+        });
+      }
+    }
     const data = {
-      customerName: orderInfo.receiverName,
-      orderItems: orderInfo.orderItems,
-      totalAmount: orderInfo.totalAmount,
+      customerName: user.lastName + ' ' + user.firstName,
+      orderItems: orderItems,
+      totalAmount: order.totalPrice,
+      shippingFee: order.shippingFee,
     };
+    console.log(data);
     const template = Handlebars.compile(templateContent);
     const renderedTemplate = template(data);
     const mailContent: mailContent = {
       recipients: [
         {
-          name: orderInfo.receiverName,
-          address: orderInfo.receiverEmail,
+          name: user.lastName + ' ' + user.firstName,
+          address: user.email,
         },
       ],
       subject: 'Order Confirmation',

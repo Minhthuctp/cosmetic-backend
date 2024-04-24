@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userService.findOne(email);
+    const user = await this.userService.getUserByEmail(email);
     if (user && (await bcrypt.compare(password, user.hashPassword))) {
       const { hashPassword, ...result } = user;
       return result;
@@ -44,7 +44,7 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const { email, role } = this.jwtService.verify(refreshToken);
-      const user = await this.userService.findOne(email);
+      const user = await this.userService.getUserByEmail(email);
 
       if (!user) {
         throw new UnauthorizedException();
