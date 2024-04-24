@@ -14,10 +14,11 @@ import { OrderService } from 'src/order/order.service';
 import { CartService } from 'src/cart/cart.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { UserService } from 'src/user/user.service';
-import { OrderModule } from 'src/order/order.module';
 import { Order, OrderSchema } from 'src/schemas/order.schema';
 import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
+import { BlogService } from 'src/blog/blog.service';
+import { Blog, BlogSchema } from 'src/schemas/blog.schema';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { User, UserSchema } from 'src/schemas/user.schema';
       { name: Order.name, schema: OrderSchema },
       { name: CartItem.name, schema: CartItemSchema },
       { name: User.name, schema: UserSchema },
+      { name: Blog.name, schema: BlogSchema },
     ]),
   ],
   controllers: [AdminController],
@@ -35,6 +37,7 @@ import { User, UserSchema } from 'src/schemas/user.schema';
     JwtService,
     OrderService,
     CartService,
+    BlogService,
     NotificationService,
     UserService,
     ProductService,

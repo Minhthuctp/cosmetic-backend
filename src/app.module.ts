@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
+import { BlogModule } from './blog/blog.module';
 
 const config: ConfigService = new ConfigService();
 
@@ -30,6 +31,7 @@ const config: ConfigService = new ConfigService();
     NotificationModule,
     UserModule,
     OrderModule,
+    BlogModule,
   ],
 })
 export class AppModule {}

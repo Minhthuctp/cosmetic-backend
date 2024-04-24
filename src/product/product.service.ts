@@ -218,4 +218,16 @@ export class ProductService {
       console.log(error);
     }
   }
+
+  async similarProducts(options: any) {
+    try {
+      const products = await this.productModel
+        .find(options)
+        .limit(4)
+        .populate(['images', 'categories']);
+      return products;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
