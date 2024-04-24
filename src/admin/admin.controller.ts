@@ -22,9 +22,22 @@ import { Zero, invalidPrice, invalidQuantity } from 'src/constant/common';
 import { RolesGuard } from 'src/guards/roles.guards';
 import { Roles } from 'src/guards/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CategoryDetails } from 'src/category/dto/category.dto';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiTags,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiParam,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
+import { CategoryDetails, CategoryDto } from 'src/category/dto/category.dto';
 import { ProductDto } from 'src/product/dto/product.dto';
+import { OrderService } from 'src/order/order.service';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -34,12 +47,64 @@ export class AdminController {
     private productService: ProductService,
     private categoryService: CategoryService,
     private imageService: ImageService,
+    private orderService: OrderService,
   ) {}
 
   @Post('createProduct')
   @Roles('admin')
-  @ApiOperation({ summary: 'Create product' })
-  @ApiBody({ type: ProductDto })
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiBearerAuth()
+  @ApiBody({
+    type: ProductDto,
+    description: 'Product data',
+    required: true,
+  })
+  @ApiBody({
+    description: 'Product data',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        productName: { type: 'string', description: 'Name of the product' },
+        price: { type: 'number', description: 'Price of the product' },
+        categories: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Categories of the product',
+        },
+        description: {
+          type: 'string',
+          description: 'Description of the product',
+        },
+        shortDescription: {
+          type: 'string',
+          description: 'Short description of the product',
+        },
+        productSKU: { type: 'string', description: 'SKU of the product' },
+        additionalInfos: {
+          type: 'string',
+          description: 'Additional information about the product',
+        },
+        quantity: { type: 'number', description: 'Quantity of the product' },
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'Images of the product',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiCreatedResponse({
+    description: 'The product has been successfully created.',
+    type: ProductDto,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to create the product',
+  })
   @UseInterceptors(FilesInterceptor('images'))
   async createProduct(
     @Req() req: Request,
@@ -78,6 +143,7 @@ export class AdminController {
 
   @Post('createCategory')
   @Roles('admin')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create category' })
   @ApiBody({ type: CategoryDetails })
   async createCatetory(@Req() req: Request) {
@@ -97,6 +163,36 @@ export class AdminController {
 
   @Patch('updateProduct/:id')
   @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a product' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'ID of the product to update',
+  })
+  @ApiBody({
+    type: 'object',
+    description: 'Product data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        price: { type: 'number', description: 'New price of the product' },
+        quantity: {
+          type: 'number',
+          description: 'New quantity of the product',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'The product has been successfully updated.',
+    type: ProductDto,
+  })
+  @ApiBadRequestResponse({ description: 'Price or quantity is invalid' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to update the product',
+  })
   async updateProduct(@Req() req: Request, @Param('id') id: string) {
     let product: any = {};
     if (req.body.price) {
@@ -124,6 +220,32 @@ export class AdminController {
 
   @Patch('updateCategory/:id')
   @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a category' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'ID of the category to update',
+  })
+  @ApiBody({
+    type: 'object',
+    description: 'Category data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'New name of the category' },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'The category has been successfully updated.',
+    type: CategoryDto,
+  })
+  @ApiBadRequestResponse({ description: 'Name is invalid' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to update the category',
+  })
   async updateCategory(@Req() req: Request, @Param('id') id: string) {
     let category: any = {};
     if (req.body.name) {
@@ -144,5 +266,157 @@ export class AdminController {
       );
     }
     return categoryUpdate;
+  }
+
+  // Get all orders for admin (can filter by status if does not pass order status, return all orders)
+  @Get('orders')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOkResponse({
+    description: 'The orders have been successfully retrieved.',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Status of the orders to retrieve',
+  })
+  @ApiBadRequestResponse({ description: 'Status is invalid' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to retrieve the orders',
+  })
+  async getOrders(@Req() req: Request, @Query('status') status: string) {
+    let orders;
+    if (status == undefined || status == 'null' || status == '') {
+      orders = await this.orderService.getOrders();
+    } else {
+      orders = await this.orderService.getOrdersByStatus(status);
+    }
+    if (!orders) {
+      throw new HttpException(
+        'Failed to retrieve orders',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return orders;
+  }
+
+  // Get dashboard for admin including total orders in the specify time range, total revenue and the number of order based on status
+  @Get('dashboard')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get dashboard' })
+  @ApiQuery({
+    name: 'startDate',
+    required: true,
+    description: 'Start date in YYYY-MM-DD format',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: true,
+    description: 'End date in YYYY-MM-DD format',
+  })
+  @ApiOkResponse({
+    description: 'The dashboard has been successfully retrieved.',
+    schema: {
+      type: 'object',
+      properties: {
+        totalOrders: {
+          type: 'number',
+          description: 'Total number of orders in the specified time range.',
+        },
+        totalOrdersBasedOnDay: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                format: 'date',
+                description: 'Date of the orders.',
+              },
+              count: {
+                type: 'number',
+                description: 'Number of orders on the date.',
+              },
+            },
+          },
+          description:
+            'Number of orders grouped by date in the specified time range.',
+        },
+        totalOrdersBasedOnStatus: {
+          type: 'object',
+          additionalProperties: {
+            type: 'number',
+          },
+          description:
+            'Number of orders grouped by status in the specified time range.',
+        },
+        totalRevenue: {
+          type: 'number',
+          description: 'Total revenue in the specified time range.',
+        },
+        topProducts: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              productName: {
+                type: 'string',
+                description: 'Name of the product.',
+              },
+              quantity: {
+                type: 'number',
+                description: 'Number of times the product was ordered.',
+              },
+            },
+          },
+          description: 'Top selling products in the specified time range.',
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to retrieve the dashboard',
+  })
+  async getDashboard(
+    @Req() req: Request,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    const totalOrders = await this.orderService.getTotalOrderForDashBoard(
+      startDate,
+      endDate,
+    );
+
+    const totalOrdersBasedOnDay =
+      await this.orderService.getOrdersGroupByDateForDashboard(
+        startDate,
+        endDate,
+      );
+
+    const totalOrdersBasedOnStatus =
+      await this.orderService.getOrdersGroupByStatusForDashboard(
+        startDate,
+        endDate,
+      );
+
+    const totalRevenue = await this.orderService.getTotalRevenue(
+      startDate,
+      endDate,
+    );
+
+    const topProducts = await this.orderService.getTopSellingProducts(
+      startDate,
+      endDate,
+    );
+
+    return {
+      totalOrders,
+      totalOrdersBasedOnDay,
+      totalOrdersBasedOnStatus,
+      totalRevenue,
+      topProducts,
+    };
   }
 }

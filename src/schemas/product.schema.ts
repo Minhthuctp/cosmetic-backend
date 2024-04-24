@@ -6,6 +6,20 @@ export type ProductDocument = Product & Document;
 import { Category } from './category.schema';
 import { Image } from './image.schema';
 
+@Schema()
+export class Review {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  user: string;
+
+  @Prop({ required: true })
+  rating: number;
+
+  @Prop({ required: true })
+  comment: string;
+}
+
+export const ReviewSchema = SchemaFactory.createForClass(Review);
+
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true })
@@ -48,6 +62,12 @@ export class Product {
     ],
   })
   categories: Category[];
+
+  @Prop({ type: [ReviewSchema], default: [] })
+  reviews: Review[];
+
+  @Prop({ default: 0 })
+  overallRating: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

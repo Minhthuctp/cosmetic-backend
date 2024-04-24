@@ -5,7 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument } from 'src/schemas/Product.schema';
+import { Product, ProductDocument, Review } from 'src/schemas/Product.schema';
 import { ClientSession, Model } from 'mongoose';
 import { productQuery } from './dto/productQuery.dto';
 import { Request } from 'express';
@@ -17,12 +17,14 @@ import {
 } from '../constant/common';
 import { buildProductOptions, buildProductSort } from './utils/helper';
 import { ProductDto, ProductUpdateDto } from './dto/product.dto';
+import { CategoryService } from 'src/category/category.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name)
     private productModel: Model<ProductDocument>,
+    private categoryService: CategoryService,
   ) {}
 
   async getListProducts(req: Request) {
@@ -126,6 +128,14 @@ export class ProductService {
   @UsePipes(new ValidationPipe({ transform: true }))
   async createProduct(productDto: ProductDto) {
     try {
+      for (let category of productDto.categories) {
+        const categoryDetails = await this.categoryService.getCategoryByIds([
+          category.id,
+        ]);
+        if (!categoryDetails) {
+          throw new Error('Category is required');
+        }
+      }
       return (await this.productModel.create(productDto)).populate([
         'images',
         'categories',
@@ -152,7 +162,9 @@ export class ProductService {
     productId: string,
     session?: ClientSession,
   ): Promise<Product> {
-    let productQuery = this.productModel.findById(productId);
+    let productQuery = this.productModel
+      .findById(productId)
+      .populate(['images', 'categories']);
     if (session) {
       productQuery = productQuery.session(session);
     }
@@ -182,5 +194,28 @@ export class ProductService {
 
     product.quantity -= quantityToDecrement;
     await product.save({ session });
+  }
+
+  // Add a review to a product
+  async addReviewToProduct(productId: string, review: Review) {
+    try {
+      let product = await this.productModel.findById(productId);
+      if (!product) {
+        throw new NotFoundException(`Product with ID ${productId} not found.`);
+      }
+      // Calculate the average rating
+      const totalRating = product.reviews.reduce(
+        (acc, review) => acc + review.rating,
+        0,
+      );
+      const overallRating =
+        (totalRating + review.rating) / (product.reviews.length + 1);
+      product.overallRating = overallRating;
+      product.reviews.push(review);
+      await product.save();
+      return product;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

@@ -8,9 +8,6 @@ export class CartDetailsDto {
 }
 
 export class CreateCartDto {
-  @ApiProperty({ required: true })
-  @IsString()
-  @IsNotEmpty()
   userId: string;
 
   @ApiProperty({ required: true })

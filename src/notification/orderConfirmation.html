@@ -54,26 +54,33 @@
     <div class="order-details">
       <table>
         <tr>
-          <th>Product</th>
+          <th>ProductName</th>
+          <th>ProductImage</th>
           <th>Quantity</th>
           <th>Price</th>
         </tr>
         {{#each orderItems}}
         <tr>
           <td>{{ this.productName }}</td>
-          <td>{{ this.quantity }}</td>
-          <td>${{ this.price }}</td>
           <td>
             <img
-              src="{{ this.imageUrl }}"
+              src="{{ this.productImage }}"
               alt="{{ this.productName }}"
               class="product-image"
             />
           </td>
+          <td>{{ this.quantity }}</td>
+          <td>${{ this.price }}</td>
         </tr>
         {{/each}}
         <tr>
-          <td colspan="2" style="text-align: right">
+          <td colspan="3" style="text-align: right">
+            <strong>Shipping Fee:</strong>
+          </td>
+          <td>${{ shippingFee }}</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="text-align: right">
             <strong>Total:</strong>
           </td>
           <td>${{ totalAmount }}</td>

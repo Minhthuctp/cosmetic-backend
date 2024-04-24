@@ -3,7 +3,7 @@ import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
-import { Cart, CartSchema } from 'src/schemas/cart.schema';
+import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
 import { Order, OrderSchema } from 'src/schemas/order.schema';
 import { Product, ProductSchema } from 'src/schemas/Product.schema';
 import { Category, CategorySchema } from 'src/schemas/category.schema';
@@ -13,18 +13,22 @@ import { ProductService } from 'src/product/product.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CartModule } from 'src/cart/cart.module';
+import { CategoryModule } from 'src/category/category.module';
+import { NotificationService } from 'src/notification/notification.service';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
     CartModule,
+    CategoryModule,
     MongooseModule.forFeature([
       {
         name: User.name,
         schema: UserSchema,
       },
       {
-        name: Cart.name,
-        schema: CartSchema,
+        name: CartItem.name,
+        schema: CartItemSchema,
       },
       {
         name: Order.name,
@@ -37,10 +41,12 @@ import { CartModule } from 'src/cart/cart.module';
   ],
   providers: [
     CartService,
+    ProductService,
+    NotificationService,
+    UserService,
     JwtService,
     ConfigService,
     OrderService,
-    ProductService,
   ],
   controllers: [OrderController],
 })

@@ -10,6 +10,14 @@ import { Category, CategorySchema } from 'src/schemas/category.schema';
 import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { JwtService } from '@nestjs/jwt';
+import { OrderService } from 'src/order/order.service';
+import { CartService } from 'src/cart/cart.service';
+import { NotificationService } from 'src/notification/notification.service';
+import { UserService } from 'src/user/user.service';
+import { OrderModule } from 'src/order/order.module';
+import { Order, OrderSchema } from 'src/schemas/order.schema';
+import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
+import { User, UserSchema } from 'src/schemas/user.schema';
 
 @Module({
   imports: [
@@ -17,11 +25,18 @@ import { JwtService } from '@nestjs/jwt';
       { name: Product.name, schema: ProductSchema },
       { name: Category.name, schema: CategorySchema },
       { name: Image.name, schema: ImageSchema },
+      { name: Order.name, schema: OrderSchema },
+      { name: CartItem.name, schema: CartItemSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [AdminController],
   providers: [
     JwtService,
+    OrderService,
+    CartService,
+    NotificationService,
+    UserService,
     ProductService,
     CloudinaryService,
     CategoryService,
