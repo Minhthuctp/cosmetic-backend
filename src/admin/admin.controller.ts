@@ -38,6 +38,7 @@ import {
 import { CategoryDetails, CategoryDto } from 'src/category/dto/category.dto';
 import { ProductDto } from 'src/product/dto/product.dto';
 import { OrderService } from 'src/order/order.service';
+import { BlogService } from 'src/blog/blog.service';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -48,6 +49,7 @@ export class AdminController {
     private categoryService: CategoryService,
     private imageService: ImageService,
     private orderService: OrderService,
+    private blogService: BlogService,
   ) {}
 
   @Post('createProduct')
@@ -418,5 +420,92 @@ export class AdminController {
       totalRevenue,
       topProducts,
     };
+  }
+
+  // Create a blog
+  @Post('createBlog')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a blog' })
+  @ApiBody({
+    type: 'object',
+    description: 'Blog data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Title of the blog' },
+        content: { type: 'string', description: 'Content of the blog' },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'The blog has been successfully created.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to create the blog',
+  })
+  async createBlog(@Req() req: Request & { user: { id: string } }) {
+    const newBlog: any = {
+      title: req.body.title,
+      content: req.body.content,
+      author: req.user.id,
+    };
+
+    const blog = await this.blogService.createBlog(newBlog);
+    if (!blog) {
+      throw new HttpException(
+        'Failed to create new blog',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return blog;
+  }
+
+  // Update blog by id
+  @Patch('updateBlog/:id')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a blog' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'ID of the blog to update',
+  })
+  @ApiBody({
+    type: 'object',
+    description: 'Blog data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'New title of the blog' },
+        content: { type: 'string', description: 'New content of the blog' },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'The blog has been successfully updated.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to update the blog',
+  })
+  async updateBlog(@Req() req: Request, @Param('id') id: string) {
+    let blog: any = {};
+    if (req.body.title) {
+      blog.title = String(req.body.title as any) || '';
+    }
+    if (req.body.content) {
+      blog.content = String(req.body.content as any) || '';
+    }
+
+    const blogUpdate = await this.blogService.updateBlog(id, blog);
+    if (!blogUpdate) {
+      throw new HttpException(
+        'Failed to update blog',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return blogUpdate;
   }
 }
