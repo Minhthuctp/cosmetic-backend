@@ -32,7 +32,7 @@ export class ProductController {
   @ApiQuery({
     name: 'sortBy',
     type: String,
-    enum: ['priceAsc', 'priceDesc', 'createAt'],
+    enum: ['priceAsc', 'priceDesc', 'lastest'],
     required: false,
   })
   async products(@Req() req: Request) {
