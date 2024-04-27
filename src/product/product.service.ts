@@ -17,7 +17,7 @@ import {
 } from '../constant/common';
 import { buildProductOptions, buildProductSort } from './utils/helper';
 import { ProductDto, ProductUpdateDto } from './dto/product.dto';
-import { CategoryService } from 'src/category/category.service';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class ProductService {
