@@ -100,7 +100,6 @@ export class ProductService {
 
   async get(options: any, page?: number, limit?: number, sort?: any) {
     try {
-      console.log(options);
       const products = await this.productModel
         .find(options)
         .skip((page - 1) * limit)
@@ -197,9 +196,16 @@ export class ProductService {
   }
 
   // Add a review to a product
-  async addReviewToProduct(productId: string, review: Review) {
+  async addReviewToProduct(
+    productId: string,
+    review: Review,
+    options?: { session: ClientSession },
+  ) {
+    const session = options?.session;
     try {
-      let product = await this.productModel.findById(productId);
+      let product = await this.productModel.findById(productId, null, {
+        session,
+      });
       if (!product) {
         throw new NotFoundException(`Product with ID ${productId} not found.`);
       }
@@ -212,7 +218,7 @@ export class ProductService {
         (totalRating + review.rating) / (product.reviews.length + 1);
       product.overallRating = overallRating;
       product.reviews.push(review);
-      await product.save();
+      await product.save({ session });
       return product;
     } catch (error) {
       console.log(error);

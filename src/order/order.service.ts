@@ -22,15 +22,22 @@ import { Review } from 'src/schemas/Product.schema';
 
 // create a enum to make sure that the status is one of the following and does not update reserverd status
 enum OrderStatus {
-  Pending = 1,
-  Confirmed = 2,
-  Shipping = 3,
-  Completed = 4,
-  Cancelled = 5,
+  Pending = 'pending',
+  Confirmed = 'confirmed',
+  Delivering = 'delivering',
+  Delivered = 'delivered',
+  Cancelled = 'cancelled',
 }
 
 @Injectable()
 export class OrderService {
+  private orderStatusSequence = [
+    OrderStatus.Pending,
+    OrderStatus.Confirmed,
+    OrderStatus.Delivering,
+    OrderStatus.Delivered,
+    OrderStatus.Cancelled,
+  ];
   constructor(
     private cartService: CartService,
     private productService: ProductService,
@@ -119,23 +126,39 @@ export class OrderService {
     }
   }
 
-  private isValidStatus(newStatus: string): boolean {
-    return (
-      Object.values(OrderStatus).includes(newStatus as any) &&
-      newStatus !== OrderStatus.Cancelled.toString() // Fix: Compare with the string value of OrderStatus.Cancelled
+  private isValidStatus(currentStatus: string, newStatus: string): boolean {
+    const currentStatusIndex = this.orderStatusSequence.indexOf(
+      currentStatus as any,
     );
+    const newStatusIndex = this.orderStatusSequence.indexOf(newStatus as any);
+
+    if (currentStatusIndex === -1 || newStatusIndex === -1) {
+      return false;
+    }
+
+    return newStatusIndex > currentStatusIndex;
   }
   // Update status and check if status is valid and do not update reserved status
-  async updateOrderStatus(orderId: string, newStatus: string, userId: string) {
+  async updateOrderStatus(
+    orderId: string,
+    currentStatus: string,
+    newStatus: string,
+    userId?: string,
+  ) {
     try {
-      if (!this.isValidStatus(newStatus)) {
+      if (!this.isValidStatus(currentStatus, newStatus)) {
         throw new Error('Invalid or reserved order status');
       }
 
-      const order = await this.orderModel.findById({
-        id: orderId,
-        userId: userId,
-      });
+      let order: OrderDocument;
+      if (userId) {
+        order = await this.orderModel.findById({
+          _id: orderId,
+          userId: userId,
+        });
+      } else {
+        order = await this.orderModel.findById(orderId);
+      }
       if (!order) {
         throw new Error('Order not found');
       }
@@ -166,16 +189,25 @@ export class OrderService {
     orderId: string,
     userId: string,
     productId: string,
+    session?: ClientSession,
   ) {
     try {
-      console.log(orderId, userId, productId);
-      const order = await this.orderModel.findOne({
-        _id: orderId,
-        user: userId,
-      });
+      const order = await this.orderModel.findOne(
+        {
+          _id: orderId,
+          user: userId,
+        },
+        null,
+        { session },
+      );
 
       if (!order) {
         console.log('Order not found');
+        return;
+      }
+
+      if (order.status !== 'delivered') {
+        console.log('Order not delivered');
         return;
       }
 
@@ -192,7 +224,7 @@ export class OrderService {
       }
 
       order.markModified('orderItems');
-      const updatedOrder = await order.save();
+      const updatedOrder = await order.save({ session });
       return updatedOrder;
     } catch (error) {
       console.log(error);
@@ -262,11 +294,14 @@ export class OrderService {
     comment: string,
     rating: number,
   ) {
+    const session = await this.orderModel.db.startSession();
+    session.startTransaction();
     try {
       const order = await this.updateOrderItemReviewStatus(
         orderId,
         userId,
         productId,
+        session,
       );
       if (!order) {
         throw new NotFoundException(
@@ -282,11 +317,16 @@ export class OrderService {
       const product = await this.productService.addReviewToProduct(
         productId,
         reviewData,
+        { session },
       );
+      await session.commitTransaction();
       return product;
     } catch (error) {
       console.log(error);
+      await session.abortTransaction();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 

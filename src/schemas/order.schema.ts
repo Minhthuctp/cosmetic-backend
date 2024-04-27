@@ -28,31 +28,31 @@ export class DeliveryInfo {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  shippingCustomerName: string;
+  customerName: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingDistrict: string;
+  district: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingWard: string;
+  ward: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingProvince: string;
+  province: string;
 
   @ApiProperty()
   @Prop({ required: true })
   @IsNotEmpty()
   @IsString()
-  shippingAddressDetails: string;
+  addressDetails: string;
 }
 
 export class Payment {
@@ -87,7 +87,7 @@ export class Order {
 
   @ApiProperty()
   @Prop({ required: true, type: DeliveryInfo, default: {} })
-  DeliveryInfo: DeliveryInfo;
+  deliveryInfo: DeliveryInfo;
 
   @ApiProperty()
   @Prop({ required: true })
@@ -100,7 +100,7 @@ export class Order {
   @ApiProperty()
   @Prop({
     required: true,
-    enum: ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'],
+    enum: ['pending', 'confirmed', 'delivering', 'delivered', 'cancelled'],
   })
   status: string;
 }
