@@ -6,9 +6,9 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDetail } from 'src/user/dto/userDetail.dto';
-import { UserService } from 'src/user/user.service';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UserDetail } from '../user/dto/userDetail.dto';
+import { UserService } from '../user/user.service';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogInRequest } from './dto/logInRequest.dto';
 
 @Controller('auth')

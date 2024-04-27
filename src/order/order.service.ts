@@ -13,11 +13,11 @@ import {
   OrderItem,
   DeliveryInfo,
 } from 'src/schemas/order.schema';
-import { CartService } from 'src/cart/cart.service';
-import { ProductService } from 'src/product/product.service';
+import { CartService } from '../cart/cart.service';
+import { ProductService } from '../product/product.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
-import { NotificationService } from 'src/notification/notification.service';
-import { UserService } from 'src/user/user.service';
+import { NotificationService } from '../notification/notification.service';
+import { UserService } from '../user/user.service';
 import { Review } from 'src/schemas/Product.schema';
 
 // create a enum to make sure that the status is one of the following and does not update reserverd status

@@ -4,9 +4,9 @@ import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from './auth.guard';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/schemas/user.schema';
+import { User, UserSchema } from '../schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 
 require('dotenv').config();

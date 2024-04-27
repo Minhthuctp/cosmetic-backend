@@ -1,24 +1,24 @@
 import { Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { ProductService } from 'src/product/product.service';
-import { CategoryService } from 'src/category/category.service';
-import { ImageService } from 'src/image/image.service';
+import { ProductService } from '../product/product.service';
+import { CategoryService } from '../category/category.service';
+import { ImageService } from '../image/image.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from 'src/schemas/Product.schema';
-import { Category, CategorySchema } from 'src/schemas/category.schema';
-import { Image, ImageSchema } from 'src/schemas/image.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Product, ProductSchema } from '../schemas/product.schema';
+import { Category, CategorySchema } from '../schemas/category.schema';
+import { Image, ImageSchema } from '../schemas/image.schema';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { JwtService } from '@nestjs/jwt';
-import { OrderService } from 'src/order/order.service';
-import { CartService } from 'src/cart/cart.service';
-import { NotificationService } from 'src/notification/notification.service';
-import { UserService } from 'src/user/user.service';
-import { Order, OrderSchema } from 'src/schemas/order.schema';
-import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
-import { User, UserSchema } from 'src/schemas/user.schema';
-import { BlogService } from 'src/blog/blog.service';
-import { Blog, BlogSchema } from 'src/schemas/blog.schema';
+import { OrderService } from '../order/order.service';
+import { CartService } from '../cart/cart.service';
+import { NotificationService } from '../notification/notification.service';
+import { UserService } from '../user/user.service';
+import { Order, OrderSchema } from '../schemas/order.schema';
+import { CartItem, CartItemSchema } from '../schemas/cart.schema';
+import { User, UserSchema } from '../schemas/user.schema';
+import { BlogService } from '../blog/blog.service';
+import { Blog, BlogSchema } from '../schemas/blog.schema';
 
 @Module({
   imports: [

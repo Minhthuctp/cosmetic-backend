@@ -6,8 +6,9 @@ import { mailContent } from './dto/mailContent.dto';
 import * as fs from 'fs';
 import * as util from 'util';
 import Handlebars from 'handlebars';
-import { Order, OrderDocument } from 'src/schemas/order.schema';
-import { User } from 'src/schemas/user.schema';
+import { Order } from '../schemas/order.schema';
+import { User } from '../schemas/user.schema';
+import * as path from 'path';
 
 @Injectable()
 export class NotificationService {
@@ -49,7 +50,7 @@ export class NotificationService {
   async sendOrderConfirmationEmail(order: Order, products, user: User) {
     const readFile = util.promisify(fs.readFile);
     const templateContent = await readFile(
-      'src/notification/orderConfirmation.html',
+      path.join(__dirname, 'orderConfirmation.html'),
       'utf8',
     );
     let orderItems = [];
