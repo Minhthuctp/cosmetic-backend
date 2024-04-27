@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
 import { Order, OrderSchema } from 'src/schemas/order.schema';
-import { Product, ProductSchema } from 'src/schemas/Product.schema';
+import { Product, ProductSchema } from '../schemas/product.schema';
 import { Category, CategorySchema } from 'src/schemas/category.schema';
 import { Image, ImageSchema } from 'src/schemas/image.schema';
 import { CartService } from 'src/cart/cart.service';
