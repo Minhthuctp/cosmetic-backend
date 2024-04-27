@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from 'src/schemas/Product.schema';
-import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
-import { User, UserSchema } from 'src/schemas/user.schema';
+import { Product, ProductSchema } from '../schemas/product.schema';
+import { CartItem, CartItemSchema } from '../schemas/cart.schema';
+import { User, UserSchema } from '../schemas/user.schema';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
-import { ProductService } from 'src/product/product.service';
+import { ProductService } from '../product/product.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
-import { CategoryService } from 'src/category/category.service';
-import { Category, CategorySchema } from 'src/schemas/category.schema';
+import { UserService } from '../user/user.service';
+import { CategoryService } from '../category/category.service';
+import { Category, CategorySchema } from '../schemas/category.schema';
 
 @Module({
   imports: [

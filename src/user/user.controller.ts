@@ -9,8 +9,8 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/guards/roles.guards';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../guards/roles.guards';
 
 @Controller('user')
 @ApiTags('user')

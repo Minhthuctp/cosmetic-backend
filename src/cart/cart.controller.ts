@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/createCart.dto';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/guards/roles.guards';
-import { Roles } from 'src/guards/roles.decorator';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../guards/roles.guards';
+import { Roles } from '../guards/roles.decorator';
 import { Request } from 'express';
 import { UpdateCartDto } from './dto/updateCart.dto';
 import {
@@ -23,8 +23,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CartItem } from 'src/schemas/cart.schema';
-import { ProductService } from 'src/product/product.service';
+import { CartItem } from '../schemas/cart.schema';
 
 @Controller('cart')
 @ApiTags('cart')
@@ -37,6 +36,7 @@ export class CartController {
   @ApiBody({ type: CreateCartDto, description: 'The data for the new cart' })
   @ApiBearerAuth()
   @ApiResponse({ status: 201, description: 'The created cart', type: CartItem })
+  @Roles('user')
   async createCart(
     @Body() createCartDto: CreateCartDto,
     @Req() req: Request & { user: { id: string } },
@@ -63,6 +63,7 @@ export class CartController {
   @ApiBody({ type: UpdateCartDto, description: 'The new data for the cart' })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'The updated cart' })
+  @Roles('user')
   async updateCart(
     @Body() updateCartDto: UpdateCartDto,
     @Req() req: Request & { user: { id: string } },
@@ -83,6 +84,7 @@ export class CartController {
     description: 'The carts of the user',
     type: [CartItem],
   })
+  @Roles('user')
   async getAllCarts(@Req() req: Request & { user: { id: string } }) {
     return this.cartService.getCartsByUser(req.user.id);
   }

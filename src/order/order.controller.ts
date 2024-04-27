@@ -11,8 +11,8 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/guards/roles.guards';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../guards/roles.guards';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { Request } from 'express';
@@ -28,7 +28,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Order } from 'src/schemas/order.schema';
+import { Order } from '../schemas/order.schema';
 
 @Controller('order')
 @ApiTags('order')

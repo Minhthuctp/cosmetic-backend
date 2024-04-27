@@ -5,7 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument, Review } from 'src/schemas/Product.schema';
+import { Product, ProductDocument, Review } from '../schemas/product.schema';
 import { ClientSession, Model } from 'mongoose';
 import { productQuery } from './dto/productQuery.dto';
 import { Request } from 'express';
@@ -17,7 +17,7 @@ import {
 } from '../constant/common';
 import { buildProductOptions, buildProductSort } from './utils/helper';
 import { ProductDto, ProductUpdateDto } from './dto/product.dto';
-import { CategoryService } from 'src/category/category.service';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class ProductService {

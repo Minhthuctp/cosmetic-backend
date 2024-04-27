@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
@@ -15,13 +14,13 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { CategoryService } from 'src/category/category.service';
-import { ImageService } from 'src/image/image.service';
-import { ProductService } from 'src/product/product.service';
-import { Zero, invalidPrice, invalidQuantity } from 'src/constant/common';
-import { RolesGuard } from 'src/guards/roles.guards';
-import { Roles } from 'src/guards/roles.decorator';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { CategoryService } from '../category/category.service';
+import { ImageService } from '../image/image.service';
+import { ProductService } from '../product/product.service';
+import { Zero, invalidPrice, invalidQuantity } from '../constant/common';
+import { RolesGuard } from '../guards/roles.guards';
+import { Roles } from '../guards/roles.decorator';
+import { JwtAuthGuard } from '../auth/auth.guard';
 import {
   ApiBody,
   ApiOperation,
@@ -35,10 +34,10 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { CategoryDetails, CategoryDto } from 'src/category/dto/category.dto';
-import { ProductDto } from 'src/product/dto/product.dto';
-import { OrderService } from 'src/order/order.service';
-import { BlogService } from 'src/blog/blog.service';
+import { CategoryDetails, CategoryDto } from '../category/dto/category.dto';
+import { ProductDto } from '../product/dto/product.dto';
+import { OrderService } from '../order/order.service';
+import { BlogService } from '../blog/blog.service';
 
 @Controller('admin')
 @ApiTags('admin')

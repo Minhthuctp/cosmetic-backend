@@ -7,8 +7,8 @@ import {
   IsString,
   //ValidateNested,
 } from 'class-validator';
-import { ImageDto } from 'src/image/dto/image.dto';
-import { CategoryDto } from 'src/category/dto/category.dto';
+import { ImageDto } from '../../image/dto/image.dto';
+import { CategoryDto } from '../../category/dto/category.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductDto {

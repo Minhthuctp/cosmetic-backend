@@ -2,20 +2,20 @@ import { Module } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/schemas/user.schema';
-import { CartItem, CartItemSchema } from 'src/schemas/cart.schema';
-import { Order, OrderSchema } from 'src/schemas/order.schema';
-import { Product, ProductSchema } from 'src/schemas/Product.schema';
-import { Category, CategorySchema } from 'src/schemas/category.schema';
-import { Image, ImageSchema } from 'src/schemas/image.schema';
-import { CartService } from 'src/cart/cart.service';
-import { ProductService } from 'src/product/product.service';
+import { User, UserSchema } from '../schemas/user.schema';
+import { CartItem, CartItemSchema } from '../schemas/cart.schema';
+import { Order, OrderSchema } from '../schemas/order.schema';
+import { Product, ProductSchema } from '../schemas/product.schema';
+import { Category, CategorySchema } from '../schemas/category.schema';
+import { Image, ImageSchema } from '../schemas/image.schema';
+import { CartService } from '../cart/cart.service';
+import { ProductService } from '../product/product.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { CartModule } from 'src/cart/cart.module';
-import { CategoryModule } from 'src/category/category.module';
-import { NotificationService } from 'src/notification/notification.service';
-import { UserService } from 'src/user/user.service';
+import { CartModule } from '../cart/cart.module';
+import { CategoryModule } from '../category/category.module';
+import { NotificationService } from '../notification/notification.service';
+import { UserService } from '../user/user.service';
 
 @Module({
   imports: [
