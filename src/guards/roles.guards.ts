@@ -32,14 +32,11 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    console.log('Hello', token);
-
     try {
       const decoded = this.jwtService.verify(token, {
         secret: config.get('JWT_SECRET_ACCESS'),
       });
       const userRole = decoded.role;
-      console.log(decoded, roles);
       return roles.includes(userRole);
     } catch (err) {
       console.log(err);

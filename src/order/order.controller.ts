@@ -93,14 +93,48 @@ export class OrderController {
   @ApiParam({ name: 'id', description: 'The ID of the order to cancel' })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel an order' })
-  @ApiOkResponse({ description: 'The order has been successfully cancelled.' })
+  @ApiOkResponse({
+    description: 'The order has been successfully cancelled.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Order has been successfully cancelled',
+        },
+      },
+    },
+  })
   @ApiBadRequestResponse({ description: 'Invalid order ID' })
   @ApiInternalServerErrorResponse({ description: 'Failed to cancel the order' })
   async cancelOrder(
     @Req() req: Request & { user: { id: string } },
     @Param('id') id: string,
   ) {
-    return this.orderService.updateOrderStatus(id, 'cancelled', req.user.id);
+    const order = await this.orderService.getOrderByIdNUserId(id, req.user.id);
+    if (order.status === 'cancelled') {
+      throw new ForbiddenException('This order has already been cancelled');
+    }
+    if (order.status === 'delivered' || order.status === 'delivering') {
+      throw new ForbiddenException(
+        'This order has already been delivering or delivered',
+      );
+    }
+    if (order.status === 'confirmed' && order.payment.paymentMethod !== 'COD') {
+      throw new ForbiddenException(
+        'This order has already been confirmed and paid for',
+      );
+    }
+    const updateOrder = this.orderService.updateOrderStatus(
+      id,
+      order.status,
+      'cancelled',
+      req.user.id,
+    );
+    if (!updateOrder) {
+      throw new ForbiddenException('Failed to cancel the order');
+    }
+    return { message: 'Order has been successfully cancelled' };
   }
 
   // API to add a review to the product
@@ -115,20 +149,40 @@ export class OrderController {
         comment: { type: 'string', description: 'The comment of the review' },
         rating: { type: 'number', description: 'The rating of the review' },
       },
+      required: ['productId', 'comment', 'rating'],
     },
   })
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add a review to a product' })
+  @ApiOkResponse({
+    description: 'The review has been successfully added.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Review has been added successfully',
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse({ description: 'Invalid order ID or review data' })
+  @ApiInternalServerErrorResponse({ description: 'Failed to add the review' })
   async addReviewToProduct(
     @Req() req: Request & { user: { id: string } },
     @Param('id') id: string,
     @Body() body: { productId: string; comment: string; rating: number },
   ) {
-    return this.orderService.addReviewToProduct(
+    const product = this.orderService.addReviewToProduct(
       id,
       req.user.id,
       body.productId,
       body.comment,
       body.rating,
     );
+    if (!product) {
+      throw new ForbiddenException('Failed to add review to the product');
+    }
+    return { message: 'Review has been added successfully' };
   }
 }

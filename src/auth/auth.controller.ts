@@ -39,6 +39,11 @@ export class AuthController {
     };
     const user = await this.userService.createUser(userDetail);
 
+    // fail to create a new account
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
     return {
       ...(await this.authService.generateToken(user)),
       firstName: user['_doc'].firstName,

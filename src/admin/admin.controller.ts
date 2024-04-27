@@ -130,7 +130,6 @@ export class AdminController {
       const image = await this.imageService.createImage(img);
       imgs.push(image.id);
     }
-    // console.log(imgs);
     // ** Get array of image's id and add to our product
     newProduct.images = imgs;
     const product = await this.productService.createProduct(newProduct);
@@ -301,6 +300,75 @@ export class AdminController {
       );
     }
     return orders;
+  }
+
+  // Update order status by id
+  @Patch('updateOrderStatus/:id')
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update order status' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'ID of the order to update',
+  })
+  @ApiBody({
+    type: 'object',
+    description: 'Order data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          description: 'New status of the order',
+          enum: [
+            'pending',
+            'confirmed',
+            'delivering',
+            'delivered',
+            'cancelled',
+          ],
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'The order status has been successfully updated.',
+  })
+  @ApiBadRequestResponse({ description: 'Status is invalid' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to update the order status',
+  })
+  async updateOrderStatus(@Req() req: Request, @Param('id') id: string) {
+    const status = String(req.body.status as any) || '';
+    if (
+      status != 'pending' &&
+      status != 'confirmed' &&
+      status != 'delivering' &&
+      status != 'delivered' &&
+      status != 'cancelled'
+    ) {
+      throw new HttpException('Status is invalid', HttpStatus.BAD_REQUEST);
+    }
+
+    const order = await this.orderService.getOrderById(id);
+    if (!order) {
+      throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
+    }
+
+    const orderUpdate = await this.orderService.updateOrderStatus(
+      id,
+      order.status,
+      status,
+    );
+    if (!orderUpdate) {
+      throw new HttpException(
+        'Failed to update order status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return { message: 'Order status has been successfully updated' };
   }
 
   // Get dashboard for admin including total orders in the specify time range, total revenue and the number of order based on status
