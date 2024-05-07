@@ -53,6 +53,12 @@ export class DeliveryInfo {
   @IsNotEmpty()
   @IsString()
   addressDetails: string;
+
+  @ApiProperty()
+  @Prop({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
 }
 
 export class Payment {

@@ -8,7 +8,6 @@ import * as util from 'util';
 import Handlebars from 'handlebars';
 import { Order } from '../schemas/order.schema';
 import { User } from '../schemas/user.schema';
-import * as path from 'path';
 
 @Injectable()
 export class NotificationService {
@@ -49,8 +48,9 @@ export class NotificationService {
 
   async sendOrderConfirmationEmail(order: Order, products, user: User) {
     const readFile = util.promisify(fs.readFile);
+
     const templateContent = await readFile(
-      path.join(__dirname, 'orderConfirmation.html'),
+      'src/notification/orderConfirmation.html',
       'utf8',
     );
     let orderItems = [];
